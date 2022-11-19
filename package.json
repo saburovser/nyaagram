@@ -1,0 +1,23 @@
+{
+  "name": "anigram",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compiler": "tsc --watch",
+    "server": "node --watch ./build/index.js",
+    "start": "concurrently 'npm:compiler' 'npm:server'"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@grammyjs/menu": "^1.1.2",
+    "@tsconfig/node18": "^1.0.1",
+    "concurrently": "^7.5.0",
+    "grammy": "^1.12.0",
+    "typescript": "^4.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9"
+  }
+}
