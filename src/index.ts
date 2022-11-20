@@ -1,43 +1,15 @@
-import { Menu, MenuRange } from "@grammyjs/menu";
+import { Bot } from 'grammy';
 
-import { Bot, Context, session, SessionFlavor } from "grammy";
+import { MyContext, mySession } from './bot/session';
+import { getTitlesByName } from './api/anilist/getTitleByName';
+import { searchedReleasesMenu, searchResultsMenu } from './bot/menu';
 
-import { Anime, getAnimeByName } from './api/getTitleByName';
 
 const TOKEN = process.env.TOKEN;
-
-interface SessionData {
-  searchedAnimes: Anime[];
-  menuMessageId: number;
-}
-
-type MyContext = Context & SessionFlavor<SessionData>;
-
 const bot = new Bot<MyContext>(TOKEN ?? '');
-bot.use(session({
-  initial: () => {
-    const searchedAnimes = [] as Anime[];
+searchResultsMenu.register(searchedReleasesMenu);
+bot.use(mySession, searchResultsMenu);
 
-    return {
-      searchedAnimes,
-      menuMessageId: 0,
-    }
-  }
-}));
-
-const searchResultsMenu = new Menu<MyContext>('searchResultsMenu');
-searchResultsMenu
-  .dynamic(async (ctx) => {
-    const range = new MenuRange<MyContext>();
-    ctx.session.searchedAnimes.forEach(anime => {
-      range
-        .text(`${anime.title.romaji} / ${anime.title.native}`, (ctx) => ctx.reply(anime.id.toString()))
-        .row();
-    });
-
-    return range;
-  });
-bot.use(searchResultsMenu);
 
 bot.on('message', async ctx => {
   if (ctx.message.text === '/start') {
@@ -46,7 +18,7 @@ bot.on('message', async ctx => {
   await ctx.deleteMessage();
 
   const title = ctx.message.text!;
-  ctx.session.searchedAnimes = await getAnimeByName(title);
+  ctx.session.searchedAnimes = await getTitlesByName(title);
 
   if (ctx.session.menuMessageId) {
     await ctx.api.editMessageReplyMarkup(ctx.chat.id, ctx.session.menuMessageId, {reply_markup: searchResultsMenu}).catch();
@@ -58,4 +30,4 @@ bot.on('message', async ctx => {
 
 bot.start({
   onStart: () => console.log('Up and running!')
-}).catch(e => console.log(e))
+}).catch(e => console.log(e));
