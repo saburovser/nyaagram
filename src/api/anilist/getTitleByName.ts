@@ -23,7 +23,9 @@ export async function getTitlesByName(name: string) {
           title {
             romaji
             native
+            english
           }
+          synonyms
           id
         }
       }

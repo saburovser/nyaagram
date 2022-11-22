@@ -1,7 +1,11 @@
+export interface Title {
+  romaji: string;
+  native: string;
+  english: string;
+}
+
 export interface Anime {
-  title: {
-    romaji: string;
-    native: string;
-  }
+  title: Title;
   id: number;
+  synonyms: string[];
 }

@@ -1,16 +1,12 @@
 import { session } from 'grammy';
 
-import { Anime } from '../../api/anilist/types';
+import { MyContext, SessionData } from './MyContext';
 
-export const mySession = session({
-  initial: () => {
-    const searchedAnimes = [] as Anime[];
-    const searchedReleases = [] as string[];
-
-    return {
-      searchedAnimes,
-      searchedReleases,
-      menuMessageId: 0,
-    }
-  }
+export const mySession = session<SessionData, MyContext>({
+  initial: () => ({
+    searchedAnimes: [],
+    searchedReleases: [],
+    searchedResolutions: [],
+    menuMessageId: 0,
+  })
 });

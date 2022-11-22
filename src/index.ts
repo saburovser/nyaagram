@@ -2,12 +2,13 @@ import { Bot } from 'grammy';
 
 import { MyContext, mySession } from './bot/session';
 import { getTitlesByName } from './api/anilist/getTitleByName';
-import { searchedReleasesMenu, searchResultsMenu } from './bot/menu';
+import { searchedReleasesMenu, searchedResolutionsMenu, searchResultsMenu } from './bot/menu';
 
 
 const TOKEN = process.env.TOKEN;
 const bot = new Bot<MyContext>(TOKEN ?? '');
 searchResultsMenu.register(searchedReleasesMenu);
+searchedReleasesMenu.register(searchedResolutionsMenu);
 bot.use(mySession, searchResultsMenu);
 
 
@@ -26,6 +27,10 @@ bot.on('message', async ctx => {
     const response = await ctx.reply('Search results:', {reply_markup: searchResultsMenu});
     ctx.session.menuMessageId = response.message_id;
   }
+});
+
+bot.catch((e) => {
+  return e.ctx.reply(['```', JSON.stringify(e, undefined,' '), '```'].join('\n'), { parse_mode: 'MarkdownV2' });
 });
 
 bot.start({
