@@ -15,7 +15,7 @@ bot.use(mySession, searchResultsMenu);
 
 bot.on('message', async ctx => {
   if (ctx.message.text === '/start') {
-    return ctx.reply("Let's search for ongoing anime!")
+    return ctx.reply("Let's search for ongoing anime together!")
   }
   await ctx.deleteMessage();
 

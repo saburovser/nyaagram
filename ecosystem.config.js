@@ -11,7 +11,7 @@ module.exports = {
       ref: "origin/master",
       repo: "git@github.com:saburovser/nyaagram.git",
       path: "/var/www/anigram",
-      "post-deploy": "npm i && npx tsc && pm2 restart anigram"
+      "post-deploy": "npm i && npx tsc && pm2 restart ecosystem.config.js"
     }
   }
 }
