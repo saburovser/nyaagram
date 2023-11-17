@@ -12,6 +12,6 @@ export async function getTorrentFile(search: string) {
 
   return {
     buffer,
-    name: link.href.match(/[0-9]+.torrent/)![0],
+    name: `${search}.torrent`,
   }
 }

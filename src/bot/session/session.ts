@@ -7,6 +7,5 @@ export const mySession = session<SessionData, MyContext>({
     searchedAnimes: [],
     searchedReleases: [],
     searchedResolutions: [],
-    menuMessageId: 0,
   })
 });

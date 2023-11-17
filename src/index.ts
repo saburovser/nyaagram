@@ -2,8 +2,9 @@ import ngrok from 'ngrok';
 import express from 'express';
 import { Bot, webhookCallback } from 'grammy';
 
+import { initDB } from './db';
 import { MyContext, mySession } from './bot/session';
-import { getTitlesByName } from './api/anilist/getTitleByName';
+import { getTitlesByName } from './api/anilist';
 import { searchedReleasesMenu, searchedResolutionsMenu, searchResultsMenu } from './bot/menu';
 
 
@@ -17,36 +18,34 @@ bot.on('message', async ctx => {
   if (ctx.message.text === '/start') {
     return ctx.reply("Let's search for ongoing anime together!")
   }
-  await ctx.deleteMessage();
 
   const title = ctx.message.text!;
   ctx.session.searchedAnimes = await getTitlesByName(title);
 
-  if (ctx.session.menuMessageId) {
-    await ctx.api.editMessageReplyMarkup(ctx.chat.id, ctx.session.menuMessageId, {reply_markup: searchResultsMenu}).catch();
-  } else {
-    const response = await ctx.reply('Search results:', {reply_markup: searchResultsMenu});
-    ctx.session.menuMessageId = response.message_id;
-  }
-});
-
-bot.catch((e) => {
-  return e.ctx.reply(['```', JSON.stringify(e, undefined,' '), '```'].join('\n'), { parse_mode: 'MarkdownV2' });
+  await ctx.reply('Search results:', {reply_markup: searchResultsMenu});
 });
 
 const server = express();
 server.use(express.json());
-server.post('/bot-webhook', webhookCallback(bot, 'express'), e => console.log(e));
+server.post('/bot-webhook', webhookCallback(bot, 'express'));
+// @ts-ignore
+server.post('/bot-webhook', (error, req, res, next) => {
+  console.log("Error Handling Middleware called")
+  console.log('Path: ', req.path)
+  next() // (optional) invoking next middleware
+});
 
 async function setup() {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'production') {
+    await bot.api.setWebhook(process.env.HOST ?? '');
+  } else {
     const host = await ngrok.connect(Number(process.env.PORT));
     console.log('ngrok connected on', host);
     await bot.api.setWebhook(host + '/bot-webhook');
-  } else {
-    await bot.api.setWebhook(process.env.HOST ?? '');
   }
   server.listen(process.env.PORT);
+
+  await initDB();
 }
 
-setup().then(() => console.log('Up and running!'))
+setup().then(() => console.log('Up and running!'));

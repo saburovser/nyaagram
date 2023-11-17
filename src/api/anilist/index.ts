@@ -55,3 +55,22 @@ export async function getLastEpisodeById(id: number) {
 
   return lastEpisode > 9 ? lastEpisode.toString() : `0${ lastEpisode }`;
 }
+
+export async function getNextAiringEpisodeById(id: number) {
+  const query = `
+    {
+      Media(id: ${id}) {
+        airingSchedule(notYetAired: true, perPage: 1) {
+          nodes {
+            episode
+          }
+        }
+      }
+    }
+  `;
+  const res = await fetchQuery<{ Media: { airingSchedule: { nodes: { episode: number }[] } } }>(query);
+
+  const lastEpisode = res.Media.airingSchedule.nodes[0].episode;
+
+  return lastEpisode > 9 ? lastEpisode.toString() : `0${ lastEpisode }`;
+}
